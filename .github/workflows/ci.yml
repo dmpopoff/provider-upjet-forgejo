@@ -10,7 +10,7 @@ on:
 
 env:
   # Common versions
-  GOLANGCI_VERSION: 'v2.12.1'
+  GOLANGCI_VERSION: 'v2.13.0'
   DOCKER_BUILDX_VERSION: 'v0.34.1'
 
 jobs:
@@ -231,6 +231,10 @@ jobs:
       - name: Vendor Dependencies
         run: make vendor vendor.check
 
+      # Runtime image embeds patched svalabs TF (also hooked via make build.init).
+      - name: Build patched svalabs TF provider
+        run: make patched-tf-provider
+
       - name: Deploying locally built provider package
         run: make local-deploy
 
@@ -290,6 +294,9 @@ jobs:
 
       - name: Vendor Dependencies
         run: make vendor vendor.check
+
+      - name: Build patched svalabs TF provider
+        run: make patched-tf-provider
 
       - name: Build Artifacts
         run: make -j2 build.all

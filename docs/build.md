@@ -91,6 +91,11 @@ spec:
 Stock svalabs v1.6.0 alone is **not** sufficient for Crossplane Observe/Create/Delete
 with empty external-name — see [fixes.md](./fixes.md).
 
+`make build` / `make local-deploy` / `make build.all` run `build.init`, which builds
+`cluster/images/provider-forgejo/patched/$(TERRAFORM_NATIVE_PROVIDER_BINARY)` via
+`./hack/build-patched-tf-provider.sh` when missing. You can also run
+`make patched-tf-provider` explicitly (CI does this before image jobs).
+
 ---
 
 ## Patched TF provider

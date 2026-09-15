@@ -97,9 +97,22 @@ fallthrough: submodules
 # we ensure image is present in daemon.
 xpkg.build.provider-forgejo: do.build.images
 
+# Patched svalabs plugin required by cluster/images/provider-forgejo (Dockerfile ADD).
+# Built for linux/amd64 regardless of host — that is what the runtime image embeds.
+PATCHED_TF_PROVIDER := cluster/images/provider-forgejo/patched/$(TERRAFORM_NATIVE_PROVIDER_BINARY)
+
+$(PATCHED_TF_PROVIDER): hack/build-patched-tf-provider.sh $(wildcard hack/svalabs-id-string-patch/*)
+	@$(INFO) building patched svalabs TF provider $(TERRAFORM_NATIVE_PROVIDER_BINARY)
+	@./hack/build-patched-tf-provider.sh
+	@$(OK) building patched svalabs TF provider
+
+.PHONY: patched-tf-provider
+patched-tf-provider: $(PATCHED_TF_PROVIDER)
+
 # NOTE(hasheddan): we ensure up is installed prior to running platform-specific
 # build steps in parallel to avoid encountering an installation race condition.
-build.init: $(UP) $(CROSSPLANE_CLI) check-terraform-version
+# Also ensure the patched TF binary exists before image/xpkg build (CI local-deploy).
+build.init: $(UP) $(CROSSPLANE_CLI) check-terraform-version $(PATCHED_TF_PROVIDER)
 
 # ====================================================================================
 # Setup Terraform for fetching provider schema

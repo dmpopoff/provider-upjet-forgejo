@@ -109,9 +109,9 @@ jobs:
       - name: Vendor Dependencies
         run: make vendor vendor.check
 
-      # Runtime image ADD requires the patched svalabs plugin (stock zip is overwritten).
-      - name: Build patched svalabs TF provider (linux/amd64)
-        run: ./hack/build-patched-tf-provider.sh
+      # Runtime image ADD requires the patched svalabs plugin (also via make build.init).
+      - name: Build patched svalabs TF provider
+        run: make patched-tf-provider
 
       - name: Build and publish xpkg to GHCR
         env:

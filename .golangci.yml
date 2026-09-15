@@ -125,7 +125,7 @@ formatters:
       simplify: true
     goimports:
       local-prefixes:
-        - github.com/crossplane/upjet-provider-template
+        - github.com/crossplane-contrib/provider-upjet-forgejo
   exclusions:
     generated: lax
     paths:
