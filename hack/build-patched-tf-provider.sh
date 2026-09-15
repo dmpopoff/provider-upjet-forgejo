@@ -44,16 +44,36 @@ if ! git -C "$SRC" checkout --detach "$GIT_REF" 2>/dev/null; then
 fi
 echo "==> HEAD $(git -C "$SRC" rev-parse HEAD)"
 
+# Overlays live in this repo with //go:build ignore so golangci-lint / go test
+# do not typecheck incomplete svalabs sources against this module. Strip the
+# constraint when copying into the svalabs tree so the patched TF provider builds.
+overlay() {
+  local src="$1" dst="$2"
+  # Drop leading build-ignore line(s) and a following blank line if present.
+  awk '
+    BEGIN { skip = 1 }
+    skip && /^\/\/go:build ignore$/ { next }
+    skip && /^\/\/ \+build ignore$/ { next }
+    skip && /^$/ { skip = 0; next }
+    { skip = 0; print }
+  ' "$src" > "$dst"
+}
+
 echo "==> overlay patched resource files"
-cp "${PATCH_DIR}/idstring.go" "${SRC}/internal/provider/"
-cp "${PATCH_DIR}/organization_resource.go" "${SRC}/internal/provider/"
-cp "${PATCH_DIR}/repository_resource.go" "${SRC}/internal/provider/"
-cp "${PATCH_DIR}/team_resource.go" "${SRC}/internal/provider/"
-cp "${PATCH_DIR}/team_member_resource.go" "${SRC}/internal/provider/"
-cp "${PATCH_DIR}/user_resource.go" "${SRC}/internal/provider/"
-cp "${PATCH_DIR}/personal_access_token_resource.go" "${SRC}/internal/provider/"
-cp "${PATCH_DIR}/deploy_key_resource.go" "${SRC}/internal/provider/"
-cp "${PATCH_DIR}/repository_webhook_resource.go" "${SRC}/internal/provider/"
+mkdir -p "${SRC}/internal/provider"
+for f in \
+  idstring.go \
+  organization_resource.go \
+  repository_resource.go \
+  team_resource.go \
+  team_member_resource.go \
+  user_resource.go \
+  personal_access_token_resource.go \
+  deploy_key_resource.go \
+  repository_webhook_resource.go
+do
+  overlay "${PATCH_DIR}/${f}" "${SRC}/internal/provider/${f}"
+done
 
 echo "==> go build linux/amd64"
 mkdir -p "$OUT_DIR"
