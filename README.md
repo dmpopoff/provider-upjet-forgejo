@@ -39,7 +39,9 @@ Optional: `api_token` instead of username/password (basic-auth required to
 CI: [`.github/workflows/publish-ghcr.yml`](./.github/workflows/publish-ghcr.yml)
 builds the patched TF plugin and pushes
 `ghcr.io/<owner>/provider-forgejo:<tag>` on `v*` tags or manual dispatch.
-Remote: `https://github.com/dmpopoff/provider-upjet-forgejo`.
+[`.github/workflows/ci.yml`](./.github/workflows/ci.yml) includes a free
+`vuln-scan` job (`govulncheck` + Trivy fs); all third-party Actions are pinned
+by commit digest. Remote: `https://github.com/dmpopoff/provider-upjet-forgejo`.
 
 ```bash
 make submodules
