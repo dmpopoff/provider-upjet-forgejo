@@ -50,22 +50,20 @@ func TerraformSetupBuilder(version, providerSource, providerVersion string) terr
 			return ps, errors.Wrap(err, errUnmarshalCredentials)
 		}
 
-		// svalabs/forgejo provider config keys.
-		ps.Configuration = map[string]any{}
-		if v, ok := creds["host"]; ok && v != "" {
-			ps.Configuration["host"] = v
-		}
-		if v, ok := creds["api_token"]; ok && v != "" {
-			ps.Configuration["api_token"] = v
-		}
-		if v, ok := creds["username"]; ok && v != "" {
-			ps.Configuration["username"] = v
-		}
-		if v, ok := creds["password"]; ok && v != "" {
-			ps.Configuration["password"] = v
-		}
+		ps.Configuration = configurationFromCreds(creds)
 		return ps, nil
 	}
+}
+
+// configurationFromCreds maps JSON credential keys to svalabs/forgejo provider config.
+func configurationFromCreds(creds map[string]string) map[string]any {
+	cfg := map[string]any{}
+	for _, key := range []string{"host", "api_token", "username", "password"} {
+		if v := creds[key]; v != "" {
+			cfg[key] = v
+		}
+	}
+	return cfg
 }
 
 func toSharedPCSpec(pc *clusterv1beta1.ProviderConfig) (*namespacedv1beta1.ProviderConfigSpec, error) {
