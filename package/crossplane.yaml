@@ -1,0 +1,16 @@
+apiVersion: meta.pkg.crossplane.io/v1
+kind: Provider
+metadata:
+  name: provider-forgejo
+  annotations:
+    meta.crossplane.io/maintainer: Dmitry Popov <dmpopof@gmail.com>
+    meta.crossplane.io/source: https://github.com/dmpopoff/provider-upjet-forgejo
+    meta.crossplane.io/license: Apache-2.0
+    meta.crossplane.io/description: |
+      Crossplane provider for Forgejo (Upjet + svalabs/terraform-provider-forgejo).
+    meta.crossplane.io/readme: |
+      Manages Forgejo organizations, repositories, teams, deploy keys, webhooks,
+      and related resources. Runtime embeds a patched svalabs TF plugin — see docs/.
+spec:
+  capabilities:
+    - SafeStart

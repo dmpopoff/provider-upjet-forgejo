@@ -1,0 +1,12 @@
+apiVersion: forgejo.forgejo.m.crossplane.io/v1alpha1
+kind: GpgKey
+metadata:
+  annotations:
+    meta.upbound.io/example-id: forgejo/v1alpha1/gpgkey
+  labels:
+    testing.upbound.io/example-name: this
+  name: this
+  namespace: default
+spec:
+  forProvider:
+    armoredPublicKey: ${gpg_key_pair.test.public_key}

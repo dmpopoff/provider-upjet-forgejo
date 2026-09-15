@@ -1,0 +1,16 @@
+apiVersion: forgejo.forgejo.m.crossplane.io/v1alpha1
+kind: User
+metadata:
+  annotations:
+    meta.upbound.io/example-id: forgejo/v1alpha1/user
+  labels:
+    testing.upbound.io/example-name: defaults
+  name: defaults
+  namespace: default
+spec:
+  forProvider:
+    email: test_user_defaults@localhost.localdomain
+    login: test_user_defaults
+    passwordSecretRef:
+      key: example-key
+      name: example-secret

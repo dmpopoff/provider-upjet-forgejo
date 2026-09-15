@@ -1,0 +1,26 @@
+# Deprecated entry point kept for discoverability.
+# Prefer: .github/workflows/publish-ghcr.yml (self-contained, pinned, builds patched TF).
+#
+# The old reusable workflow from crossplane-contrib/provider-workflows does not
+# run ./hack/build-patched-tf-provider.sh and defaults to ghcr.io/crossplane-contrib.
+
+name: Publish Provider Package (legacy redirect)
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Unused — use workflow "Publish to GHCR" instead'
+        required: false
+        default: ''
+
+jobs:
+  redirect:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Point operators at publish-ghcr.yml
+        run: |
+          echo "::error::Use the workflow 'Publish to GHCR' (publish-ghcr.yml)."
+          echo "It builds the patched svalabs TF binary and pushes to"
+          echo "ghcr.io/${{ github.repository_owner }}/provider-forgejo."
+          exit 1

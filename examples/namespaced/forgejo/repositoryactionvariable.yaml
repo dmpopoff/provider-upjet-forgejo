@@ -1,0 +1,30 @@
+apiVersion: forgejo.forgejo.m.crossplane.io/v1alpha1
+kind: RepositoryActionVariable
+metadata:
+  annotations:
+    meta.upbound.io/example-id: forgejo/v1alpha1/repositoryactionvariable
+  labels:
+    testing.upbound.io/example-name: this
+  name: this
+  namespace: default
+spec:
+  forProvider:
+    data: my_variable_value
+    name: my_variable
+    repositoryIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: personal
+
+---
+
+apiVersion: forgejo.forgejo.m.crossplane.io/v1alpha1
+kind: Repository
+metadata:
+  annotations:
+    meta.upbound.io/example-id: forgejo/v1alpha1/repositoryactionvariable
+  labels:
+    testing.upbound.io/example-name: personal
+  name: personal
+  namespace: default
+spec:
+  forProvider: {}

@@ -1,0 +1,39 @@
+apiVersion: forgejo.forgejo.m.crossplane.io/v1alpha1
+kind: BranchProtection
+metadata:
+  annotations:
+    meta.upbound.io/example-id: forgejo/v1alpha1/branchprotection
+  labels:
+    testing.upbound.io/example-name: defaults
+  name: defaults
+  namespace: default
+spec:
+  forProvider:
+    branchName: main
+    repositoryIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: test_repo
+
+---
+
+apiVersion: forgejo.forgejo.m.crossplane.io/v1alpha1
+kind: Repository
+metadata:
+  annotations:
+    meta.upbound.io/example-id: forgejo/v1alpha1/branchprotection
+  labels:
+    testing.upbound.io/example-name: test_repo
+  name: test-repo
+  namespace: default
+spec:
+  forProvider:
+    autoInit: true
+    defaultBranch: custom
+    description: Terraform Test Repo owned by user
+    issueLabels: Default
+    name: personal_test_repo
+    private: true
+    readme: Default
+    template: true
+    trustModel: collaborator
+    website: http://localhost:3000

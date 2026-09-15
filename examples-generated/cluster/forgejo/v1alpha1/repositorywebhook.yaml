@@ -1,0 +1,39 @@
+apiVersion: forgejo.forgejo.crossplane.io/v1alpha1
+kind: RepositoryWebhook
+metadata:
+  annotations:
+    meta.upbound.io/example-id: forgejo/v1alpha1/repositorywebhook
+  labels:
+    testing.upbound.io/example-name: example
+  name: example
+spec:
+  forProvider:
+    authorizationHeaderSecretRef:
+      key: example-key
+      name: example-secret
+      namespace: upbound-system
+    branchFilter: '*'
+    config:
+      content_type: json
+      secret: supersecret
+      url: http://example.com/invoke
+    events:
+    - push
+    repositoryIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: personal
+    type: forgejo
+
+---
+
+apiVersion: forgejo.forgejo.crossplane.io/v1alpha1
+kind: Repository
+metadata:
+  annotations:
+    meta.upbound.io/example-id: forgejo/v1alpha1/repositorywebhook
+  labels:
+    testing.upbound.io/example-name: personal
+  name: personal
+spec:
+  forProvider:
+    name: personal_test_repo

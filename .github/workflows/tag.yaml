@@ -1,0 +1,42 @@
+# Create an annotated git tag (does not push the package).
+# After tagging, push the tag yourself (or use a release flow) so
+# publish-ghcr.yml can run on refs/tags/v*.
+
+name: Tag
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g. v0.2.13)'
+        required: true
+      message:
+        description: 'Tag message'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  tag:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+          # Need a token that can push tags back to the repo.
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Create and push annotated tag
+        env:
+          VERSION: ${{ github.event.inputs.version }}
+          MESSAGE: ${{ github.event.inputs.message }}
+        run: |
+          git tag -a "${VERSION}" -m "${MESSAGE}"
+          git push origin "refs/tags/${VERSION}"

@@ -1,0 +1,70 @@
+apiVersion: forgejo.forgejo.m.crossplane.io/v1alpha1
+kind: Collaborator
+metadata:
+  annotations:
+    meta.upbound.io/example-id: forgejo/v1alpha1/collaborator
+  labels:
+    testing.upbound.io/example-name: admin
+  name: admin
+  namespace: default
+spec:
+  forProvider:
+    permission: admin
+    repositoryIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: org
+    userSelector:
+      matchLabels:
+        testing.upbound.io/example-name: test
+
+---
+
+apiVersion: forgejo.forgejo.m.crossplane.io/v1alpha1
+kind: Organization
+metadata:
+  annotations:
+    meta.upbound.io/example-id: forgejo/v1alpha1/collaborator
+  labels:
+    testing.upbound.io/example-name: owner
+  name: owner
+  namespace: default
+spec:
+  forProvider:
+    name: test_org
+
+---
+
+apiVersion: forgejo.forgejo.m.crossplane.io/v1alpha1
+kind: Repository
+metadata:
+  annotations:
+    meta.upbound.io/example-id: forgejo/v1alpha1/collaborator
+  labels:
+    testing.upbound.io/example-name: org
+  name: org
+  namespace: default
+spec:
+  forProvider:
+    name: org_test_repo
+    ownerSelector:
+      matchLabels:
+        testing.upbound.io/example-name: owner
+
+---
+
+apiVersion: forgejo.forgejo.m.crossplane.io/v1alpha1
+kind: User
+metadata:
+  annotations:
+    meta.upbound.io/example-id: forgejo/v1alpha1/collaborator
+  labels:
+    testing.upbound.io/example-name: test
+  name: test
+  namespace: default
+spec:
+  forProvider:
+    email: test_user@localhost.localdomain
+    login: test_user
+    passwordSecretRef:
+      key: example-key
+      name: example-secret

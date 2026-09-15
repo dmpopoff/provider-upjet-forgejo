@@ -1,0 +1,65 @@
+package config
+
+import (
+	// Note(turkenh): we are importing this to embed provider schema document
+	_ "embed"
+
+	ujconfig "github.com/crossplane/upjet/v2/pkg/config"
+
+	"github.com/crossplane-contrib/provider-upjet-forgejo/config/cluster/forgejo"
+	nsforgejo "github.com/crossplane-contrib/provider-upjet-forgejo/config/namespaced/forgejo"
+)
+
+const (
+	resourcePrefix = "forgejo"
+	modulePath     = "github.com/crossplane-contrib/provider-upjet-forgejo"
+)
+
+//go:embed schema.json
+var providerSchema string
+
+//go:embed provider-metadata.yaml
+var providerMetadata string
+
+// GetProvider returns provider configuration (cluster-scoped MRs).
+func GetProvider() *ujconfig.Provider {
+	pc := ujconfig.NewProvider([]byte(providerSchema), resourcePrefix, modulePath, []byte(providerMetadata),
+		ujconfig.WithRootGroup("forgejo.crossplane.io"),
+		ujconfig.WithIncludeList(ExternalNameConfigured()),
+		ujconfig.WithFeaturesPackage("internal/features"),
+		ujconfig.WithDefaultResourceOptions(
+			ExternalNameConfigurations(),
+		))
+
+	for _, configure := range []func(provider *ujconfig.Provider){
+		forgejo.Configure,
+	} {
+		configure(pc)
+	}
+
+	pc.ConfigureResources()
+	return pc
+}
+
+// GetProviderNamespaced returns the namespaced provider configuration (Crossplane v2).
+func GetProviderNamespaced() *ujconfig.Provider {
+	pc := ujconfig.NewProvider([]byte(providerSchema), resourcePrefix, modulePath, []byte(providerMetadata),
+		ujconfig.WithRootGroup("forgejo.m.crossplane.io"),
+		ujconfig.WithIncludeList(ExternalNameConfigured()),
+		ujconfig.WithFeaturesPackage("internal/features"),
+		ujconfig.WithDefaultResourceOptions(
+			ExternalNameConfigurations(),
+		),
+		ujconfig.WithExampleManifestConfiguration(ujconfig.ExampleManifestConfiguration{
+			ManagedResourceNamespace: "default",
+		}))
+
+	for _, configure := range []func(provider *ujconfig.Provider){
+		nsforgejo.Configure,
+	} {
+		configure(pc)
+	}
+
+	pc.ConfigureResources()
+	return pc
+}

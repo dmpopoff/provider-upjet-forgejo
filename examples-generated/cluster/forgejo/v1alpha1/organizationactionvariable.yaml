@@ -1,0 +1,27 @@
+apiVersion: forgejo.forgejo.crossplane.io/v1alpha1
+kind: OrganizationActionVariable
+metadata:
+  annotations:
+    meta.upbound.io/example-id: forgejo/v1alpha1/organizationactionvariable
+  labels:
+    testing.upbound.io/example-name: this
+  name: this
+spec:
+  forProvider:
+    data: my_variable_value
+    name: my_variable
+    organizationId: ${forgejo_organization.test.id}
+
+---
+
+apiVersion: forgejo.forgejo.crossplane.io/v1alpha1
+kind: Organization
+metadata:
+  annotations:
+    meta.upbound.io/example-id: forgejo/v1alpha1/organizationactionvariable
+  labels:
+    testing.upbound.io/example-name: test
+  name: test
+spec:
+  forProvider:
+    name: test_org

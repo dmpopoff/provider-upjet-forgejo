@@ -1,0 +1,32 @@
+apiVersion: forgejo.forgejo.m.crossplane.io/v1alpha1
+kind: DeployKey
+metadata:
+  annotations:
+    meta.upbound.io/example-id: forgejo/v1alpha1/deploykey
+  labels:
+    testing.upbound.io/example-name: this
+  name: this
+  namespace: default
+spec:
+  forProvider:
+    key: ${trimspace(tls_private_key.ed25519.public_key_openssh)}
+    readOnly: false
+    repositoryIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: personal
+    title: test_key
+
+---
+
+apiVersion: forgejo.forgejo.m.crossplane.io/v1alpha1
+kind: Repository
+metadata:
+  annotations:
+    meta.upbound.io/example-id: forgejo/v1alpha1/deploykey
+  labels:
+    testing.upbound.io/example-name: personal
+  name: personal
+  namespace: default
+spec:
+  forProvider:
+    name: personal_test_repo

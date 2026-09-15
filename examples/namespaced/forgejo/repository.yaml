@@ -1,0 +1,43 @@
+apiVersion: forgejo.forgejo.m.crossplane.io/v1alpha1
+kind: Repository
+metadata:
+  annotations:
+    meta.upbound.io/example-id: forgejo/v1alpha1/repository
+  labels:
+    testing.upbound.io/example-name: personal_defaults
+  name: personal-defaults
+  namespace: default
+spec:
+  forProvider: {}
+
+---
+
+apiVersion: forgejo.forgejo.m.crossplane.io/v1alpha1
+kind: Organization
+metadata:
+  annotations:
+    meta.upbound.io/example-id: forgejo/v1alpha1/repository
+  labels:
+    testing.upbound.io/example-name: owner
+  name: owner
+  namespace: default
+spec:
+  forProvider: {}
+
+---
+
+apiVersion: forgejo.forgejo.m.crossplane.io/v1alpha1
+kind: User
+metadata:
+  annotations:
+    meta.upbound.io/example-id: forgejo/v1alpha1/repository
+  labels:
+    testing.upbound.io/example-name: owner
+  name: owner
+  namespace: default
+spec:
+  forProvider:
+    email: test_user@localhost.localdomain
+    passwordSecretRef:
+      key: example-key
+      name: example-secret

@@ -1,0 +1,36 @@
+apiVersion: forgejo.forgejo.m.crossplane.io/v1alpha1
+kind: PersonalAccessToken
+metadata:
+  annotations:
+    meta.upbound.io/example-id: forgejo/v1alpha1/personalaccesstoken
+  labels:
+    testing.upbound.io/example-name: test_token
+  name: test-token
+  namespace: default
+spec:
+  forProvider:
+    name: test token
+    scopes:
+    - read:repository
+    userSelector:
+      matchLabels:
+        testing.upbound.io/example-name: test_user
+
+---
+
+apiVersion: forgejo.forgejo.m.crossplane.io/v1alpha1
+kind: User
+metadata:
+  annotations:
+    meta.upbound.io/example-id: forgejo/v1alpha1/personalaccesstoken
+  labels:
+    testing.upbound.io/example-name: test_user
+  name: test-user
+  namespace: default
+spec:
+  forProvider:
+    email: test_user@localhost.localdomain
+    login: test_user
+    passwordSecretRef:
+      key: example-key
+      name: example-secret

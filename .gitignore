@@ -1,0 +1,18 @@
+/.cache
+/.work
+/_output
+cover.out
+/vendor
+/.vendor-new
+.DS_Store
+
+# ignore IDE folders
+.vscode/
+.idea/
+
+# local build artifacts
+_output/
+.cache/
+.work/
+cluster/images/provider-forgejo/patched/terraform-provider-forgejo_v*
+*.xpkg

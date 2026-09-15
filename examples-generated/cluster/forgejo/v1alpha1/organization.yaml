@@ -1,0 +1,11 @@
+apiVersion: forgejo.forgejo.crossplane.io/v1alpha1
+kind: Organization
+metadata:
+  annotations:
+    meta.upbound.io/example-id: forgejo/v1alpha1/organization
+  labels:
+    testing.upbound.io/example-name: defaults
+  name: defaults
+spec:
+  forProvider:
+    name: test_org_defaults

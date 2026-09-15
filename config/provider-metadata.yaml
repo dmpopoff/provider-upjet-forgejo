@@ -1,0 +1,930 @@
+name: svalabs/forgejo
+resources:
+    forgejo_branch_protection:
+        subCategory: ""
+        description: Forgejo branch protection resource.
+        name: forgejo_branch_protection
+        title: forgejo_branch_protection Resource - forgejo
+        examples:
+            - name: defaults
+              manifest: |-
+                {
+                  "branch_name": "main",
+                  "repository_id": "${forgejo_repository.test_repo.id}"
+                }
+              references:
+                repository_id: forgejo_repository.test_repo.id
+              dependencies:
+                forgejo_repository.test_repo: |-
+                    {
+                      "auto_init": true,
+                      "default_branch": "custom",
+                      "description": "Terraform Test Repo owned by user",
+                      "issue_labels": "Default",
+                      "name": "personal_test_repo",
+                      "private": true,
+                      "readme": "Default",
+                      "template": true,
+                      "trust_model": "collaborator",
+                      "website": "http://localhost:3000"
+                    }
+            - name: non_defaults
+              manifest: |-
+                {
+                  "approvals_whitelist_usernames": [
+                    "alice",
+                    "bob"
+                  ],
+                  "block_on_outdated_branch": true,
+                  "block_on_rejected_reviews": true,
+                  "branch_name": "main",
+                  "dismiss_stale_approvals": true,
+                  "enable_approvals_whitelist": true,
+                  "enable_merge_whitelist": true,
+                  "enable_push": true,
+                  "enable_push_whitelist": true,
+                  "merge_whitelist_usernames": [
+                    "alice",
+                    "bob"
+                  ],
+                  "push_whitelist_usernames": [
+                    "alice",
+                    "bob"
+                  ],
+                  "repository_id": "${forgejo_repository.test_repo.id}",
+                  "required_approvals": 1
+                }
+              references:
+                repository_id: forgejo_repository.test_repo.id
+              dependencies:
+                forgejo_repository.test_repo: |-
+                    {
+                      "auto_init": true,
+                      "default_branch": "custom",
+                      "description": "Terraform Test Repo owned by user",
+                      "issue_labels": "Default",
+                      "name": "personal_test_repo",
+                      "private": true,
+                      "readme": "Default",
+                      "template": true,
+                      "trust_model": "collaborator",
+                      "website": "http://localhost:3000"
+                    }
+        argumentDocs:
+            approvals_whitelist_teams: '(Set of String) Whitelisted teams for reviewing. Note: This setting is only effective if enable_approvals_whitelist is true.'
+            approvals_whitelist_usernames: '(Set of String) Whitelisted users for reviewing. Note: This setting is only effective if enable_approvals_whitelist is true.'
+            block_on_official_review_requests: (Boolean) Block merge on official review requests.
+            block_on_outdated_branch: (Boolean) Block merge if pull request is outdated.
+            block_on_rejected_reviews: (Boolean) Block merge on rejected reviews.
+            branch_name: (String) Name of the branch to protect. Changing this forces a new resource to be created.
+            dismiss_stale_approvals: (Boolean) Dismiss stale approvals.
+            enable_approvals_whitelist: (Boolean) Restrict approvals to whitelisted users or teams.
+            enable_merge_whitelist: (Boolean) Restrict merge to whitelisted users or teams.
+            enable_push: (Boolean) Enable push to the branch.
+            enable_push_whitelist: '(Boolean) Restrict push to whitelisted users or teams. Note: This setting is only effective if enable_push is true.'
+            enable_status_check: (Boolean) Enable status check.
+            merge_whitelist_teams: '(Set of String) Whitelisted teams for merging. Note: This setting is only effective if enable_merge_whitelist is true.'
+            merge_whitelist_usernames: '(Set of String) Whitelisted users for merging. Note: This setting is only effective if enable_merge_whitelist is true.'
+            protected_file_patterns: (String) Protected file patterns (separated using semicolon ';').
+            push_whitelist_deploy_keys: '(Boolean) Whitelist deploy keys with write access to push. Note: This setting is only effective if enable_push_whitelist is true.'
+            push_whitelist_teams: '(Set of String) Whitelisted teams for pushing. Note: This setting is only effective if enable_push_whitelist is true.'
+            push_whitelist_usernames: '(Set of String) Whitelisted users for pushing. Note: This setting is only effective if enable_push_whitelist is true.'
+            repository_id: (Number) Numeric identifier of the repository. Changing this forces a new resource to be created.
+            require_signed_commits: (Boolean) Require signed commits.
+            required_approvals: (Number) Number of required approvals.
+            status_check_contexts: '(List of String) Status check patterns. Note: This setting is only effective if enable_status_check is true.'
+            unprotected_file_patterns: (String) Unprotected file patterns (separated using semicolon ';').
+        importStatements:
+            - |-
+              # Import using the repo_owner/repo_name/branch.
+              terraform import forgejo_branch_protection.defaults tfadmin/personal_test_repo/main
+    forgejo_collaborator:
+        subCategory: ""
+        description: Forgejo repository collaborator resource.
+        name: forgejo_collaborator
+        title: forgejo_collaborator Resource - forgejo
+        examples:
+            - name: admin
+              manifest: |-
+                {
+                  "permission": "admin",
+                  "repository_id": "${forgejo_repository.org.id}",
+                  "user": "${forgejo_user.test.login}"
+                }
+              references:
+                repository_id: forgejo_repository.org.id
+                user: forgejo_user.test.login
+              dependencies:
+                forgejo_organization.owner: |-
+                    {
+                      "name": "test_org"
+                    }
+                forgejo_repository.org: |-
+                    {
+                      "name": "org_test_repo",
+                      "owner": "${forgejo_organization.owner.name}"
+                    }
+                forgejo_user.test: |-
+                    {
+                      "email": "test_user@localhost.localdomain",
+                      "login": "test_user",
+                      "password": "${var.test_password}"
+                    }
+        argumentDocs:
+            permission: (String) Repository permissions of the collaborator. Must be one of 'read', 'write', 'admin'.
+            repository_id: (Number) Numeric identifier of the repository. Changing this forces a new resource to be created.
+            user: (String) Username of the collaborator. Changing this forces a new resource to be created.
+        importStatements: []
+    forgejo_deploy_key:
+        subCategory: ""
+        description: Forgejo repository deploy key resource.
+        name: forgejo_deploy_key
+        title: forgejo_deploy_key Resource - forgejo
+        examples:
+            - name: this
+              manifest: |-
+                {
+                  "key": "${trimspace(tls_private_key.ed25519.public_key_openssh)}",
+                  "read_only": false,
+                  "repository_id": "${forgejo_repository.personal.id}",
+                  "title": "test_key"
+                }
+              references:
+                repository_id: forgejo_repository.personal.id
+              dependencies:
+                forgejo_repository.personal: |-
+                    {
+                      "name": "personal_test_repo"
+                    }
+                tls_private_key.ed25519: |-
+                    {
+                      "algorithm": "ED25519"
+                    }
+        argumentDocs:
+            created_at: (String) Time at which the deploy key was created.
+            fingerprint: (String) Fingerprint of the deploy key.
+            key: (String) Armored SSH key. Trailing newlines must be removed (e.g. using trimspace() function). Changing this forces a new resource to be created.
+            key_id: (Number) Numeric identifier of the deploy key.
+            read_only: (Boolean) Does the key have only read access? Changing this forces a new resource to be created.
+            repository_id: (Number) Numeric identifier of the repository. Changing this forces a new resource to be created.
+            title: (String) Title of the deploy key. Changing this forces a new resource to be created.
+            url: (String) URL of the deploy key.
+        importStatements: []
+    forgejo_gpg_key:
+        subCategory: ""
+        description: Forgejo user GPG key resource.
+        name: forgejo_gpg_key
+        title: forgejo_gpg_key Resource - forgejo
+        examples:
+            - name: this
+              manifest: |-
+                {
+                  "armored_public_key": "${gpg_key_pair.test.public_key}"
+                }
+              references:
+                armored_public_key: gpg_key_pair.test.public_key
+              dependencies:
+                gpg_key_pair.test: |-
+                    {
+                      "identities": [
+                        {
+                          "email": "test_user@localhost.localdomain",
+                          "name": "Test User"
+                        }
+                      ],
+                      "passphrase": "${var.gpg_key_password}"
+                    }
+        argumentDocs:
+            armored_public_key: (String) Armored GPG public key. Changing this forces a new resource to be created.
+            can_certify: (Boolean) Can this key certify.
+            can_encrypt_comms: (Boolean) Can this key encrypt communications.
+            can_encrypt_storage: (Boolean) Can this key encrypt storage.
+            can_sign: (Boolean) Can this key sign.
+            created_at: (String) Time at which the GPG key was created.
+            email: (String)
+            emails: (List of Object) Emails associated with the GPG key. (see below for nested schema)
+            expires_at: (String) Time at which the GPG key expires.
+            id: (Number) Numeric identifier of the GPG key.
+            key_id: (String) ID of the GPG key.
+            primary_key_id: (String) Primary ID of the GPG key.
+            public_key: (String) The public key.
+            subkeys: (List of Object) Subkeys of the GPG key. (see below for nested schema)
+            verified: (Boolean)
+        importStatements: []
+    forgejo_organization:
+        subCategory: ""
+        description: Forgejo organization resource.
+        name: forgejo_organization
+        title: forgejo_organization Resource - forgejo
+        examples:
+            - name: defaults
+              manifest: |-
+                {
+                  "name": "test_org_defaults"
+                }
+            - name: non_defaults
+              manifest: |-
+                {
+                  "description": "Purely for testing...",
+                  "full_name": "Terraform Test Org with non-default attributes",
+                  "location": "Mêlée Island",
+                  "name": "test_org_non_defaults",
+                  "visibility": "private",
+                  "website": "https://forgejo.org/"
+                }
+        argumentDocs:
+            avatar_url: (String) Avatar URL of the organization.
+            description: (String) Description of the organization.
+            full_name: (String) Full name of the organization.
+            id: (Number) Numeric identifier of the organization.
+            location: (String) Location of the organization.
+            name: (String) Name of the organization. Changing this forces a new resource to be created.
+            repo_admin_change_team_access: (Boolean) Whether repository admin can add and remove access for teams. Changing this forces a new resource to be created.
+            visibility: (String) Visibility of the organization. Possible values are 'public' (default), 'limited', or 'private'.
+            website: (String) Website of the organization.
+        importStatements: []
+    forgejo_organization_action_secret:
+        subCategory: ""
+        description: 'Forgejo organization action secret resource. Note: The authenticated user must be a member of the managed organization(s) or have administrative privileges!'
+        name: forgejo_organization_action_secret
+        title: forgejo_organization_action_secret Resource - forgejo
+        examples:
+            - name: this
+              manifest: |-
+                {
+                  "data": "my_secret_value",
+                  "name": "my_secret",
+                  "organization_id": "${forgejo_organization.test.id}"
+                }
+              references:
+                organization_id: forgejo_organization.test.id
+              dependencies:
+                forgejo_organization.test: |-
+                    {
+                      "name": "test_org"
+                    }
+        argumentDocs:
+            created_at: (String) Time at which the secret was created.
+            data: (String, Sensitive) Data of the secret.
+            name: (String) Name of the secret. Changing this forces a new resource to be created.
+            organization: '(String) Name of the owning organization. Changing this forces a new resource to be created. Note: One of organization or organization_id must be specified.'
+            organization_id: '(Number) Numeric identifier of the owning organization. Changing this forces a new resource to be created. Note: One of organization or organization_id must be specified.'
+        importStatements: []
+    forgejo_organization_action_variable:
+        subCategory: ""
+        description: 'Forgejo organization action variable resource. Note: The authenticated user must be a member of the managed organization(s) or have administrative privileges!'
+        name: forgejo_organization_action_variable
+        title: forgejo_organization_action_variable Resource - forgejo
+        examples:
+            - name: this
+              manifest: |-
+                {
+                  "data": "my_variable_value",
+                  "name": "my_variable",
+                  "organization_id": "${forgejo_organization.test.id}"
+                }
+              references:
+                organization_id: forgejo_organization.test.id
+              dependencies:
+                forgejo_organization.test: |-
+                    {
+                      "name": "test_org"
+                    }
+        argumentDocs:
+            data: (String) Data of the variable.
+            name: (String) Name of the variable.
+            organization: '(String) Name of the owning organization. Changing this forces a new resource to be created. Note: One of organization or organization_id must be specified.'
+            organization_id: '(Number) Numeric identifier of the owning organization. Changing this forces a new resource to be created. Note: One of organization or organization_id must be specified.'
+        importStatements: []
+    forgejo_personal_access_token:
+        subCategory: ""
+        description: 'Forgejo personal access token resource. Note: Due to an upstream limitation, one cannot create access tokens when authorized with access tokens. Use basic-auth instead.'
+        name: forgejo_personal_access_token
+        title: forgejo_personal_access_token Resource - forgejo
+        examples:
+            - name: test_token
+              manifest: |-
+                {
+                  "name": "test token",
+                  "scopes": [
+                    "read:repository"
+                  ],
+                  "user": "${forgejo_user.test_user.login}"
+                }
+              references:
+                user: forgejo_user.test_user.login
+              dependencies:
+                forgejo_user.test_user: |-
+                    {
+                      "email": "test_user@localhost.localdomain",
+                      "login": "test_user",
+                      "password": "${var.test_password}"
+                    }
+        argumentDocs:
+            id: (Number) Numeric identifier of the personal access token.
+            name: (String) Name of the personal access token. Changing this forces a new resource to be created.
+            scopes: (Set of String) Scopes of the personal access token. Changing this forces a new resource to be created.
+            token: (String, Sensitive) The personal access token.
+            token_last_eight: (String) Last eight characters of the personal access token.
+            user: (String) Name of the user. Changing this forces a new resource to be created.
+        importStatements: []
+    forgejo_repository:
+        subCategory: ""
+        description: 'Forgejo repository resource. Note: Managing user repositories requires administrative privileges!'
+        name: forgejo_repository
+        title: forgejo_repository Resource - forgejo
+        examples:
+            - name: personal_defaults
+              manifest: |-
+                {
+                  "name": "personal_test_repo_defaults"
+                }
+              dependencies:
+                forgejo_organization.owner: |-
+                    {
+                      "name": "test_org"
+                    }
+                forgejo_user.owner: |-
+                    {
+                      "email": "test_user@localhost.localdomain",
+                      "login": "test_user",
+                      "password": "${var.test_password}"
+                    }
+            - name: personal_non_defaults
+              manifest: |-
+                {
+                  "archived": true,
+                  "auto_init": false,
+                  "default_branch": "custom",
+                  "description": "Terraform Test Repo owned by user with non-default attributes",
+                  "external_tracker": {
+                    "external_tracker_format": "https://github.com/svalabs/terraform-provider-forgejo/issues/{index}",
+                    "external_tracker_style": "numeric",
+                    "external_tracker_url": "https://github.com/svalabs/terraform-provider-forgejo/issues"
+                  },
+                  "issue_labels": "Default",
+                  "name": "personal_test_repo_non_defaults",
+                  "private": true,
+                  "readme": "Default",
+                  "template": true,
+                  "trust_model": "collaborator",
+                  "website": "http://localhost:3000"
+                }
+              dependencies:
+                forgejo_organization.owner: |-
+                    {
+                      "name": "test_org"
+                    }
+                forgejo_user.owner: |-
+                    {
+                      "email": "test_user@localhost.localdomain",
+                      "login": "test_user",
+                      "password": "${var.test_password}"
+                    }
+            - name: org_defaults
+              manifest: |-
+                {
+                  "name": "org_test_repo_defaults",
+                  "owner": "${forgejo_organization.owner.name}"
+                }
+              references:
+                owner: forgejo_organization.owner.name
+              dependencies:
+                forgejo_organization.owner: |-
+                    {
+                      "name": "test_org"
+                    }
+                forgejo_user.owner: |-
+                    {
+                      "email": "test_user@localhost.localdomain",
+                      "login": "test_user",
+                      "password": "${var.test_password}"
+                    }
+            - name: org_non_defaults
+              manifest: |-
+                {
+                  "archived": true,
+                  "auto_init": false,
+                  "default_branch": "custom",
+                  "description": "Terraform Test Repo owned by org with non-default attributes",
+                  "external_tracker": {
+                    "external_tracker_format": "https://github.com/svalabs/terraform-provider-forgejo/issues/{index}",
+                    "external_tracker_style": "numeric",
+                    "external_tracker_url": "https://github.com/svalabs/terraform-provider-forgejo/issues"
+                  },
+                  "issue_labels": "Default",
+                  "name": "org_test_repo_non_defaults",
+                  "owner": "${forgejo_organization.owner.name}",
+                  "private": true,
+                  "readme": "Default",
+                  "template": true,
+                  "trust_model": "collaborator",
+                  "website": "http://localhost:3000"
+                }
+              references:
+                owner: forgejo_organization.owner.name
+              dependencies:
+                forgejo_organization.owner: |-
+                    {
+                      "name": "test_org"
+                    }
+                forgejo_user.owner: |-
+                    {
+                      "email": "test_user@localhost.localdomain",
+                      "login": "test_user",
+                      "password": "${var.test_password}"
+                    }
+            - name: user_defaults
+              manifest: |-
+                {
+                  "name": "user_test_repo_defaults",
+                  "owner": "${forgejo_user.owner.login}"
+                }
+              references:
+                owner: forgejo_user.owner.login
+              dependencies:
+                forgejo_organization.owner: |-
+                    {
+                      "name": "test_org"
+                    }
+                forgejo_user.owner: |-
+                    {
+                      "email": "test_user@localhost.localdomain",
+                      "login": "test_user",
+                      "password": "${var.test_password}"
+                    }
+            - name: user_non_defaults
+              manifest: |-
+                {
+                  "archived": true,
+                  "auto_init": false,
+                  "default_branch": "custom",
+                  "description": "Terraform Test Repo owned by user with non-default attributes",
+                  "external_tracker": {
+                    "external_tracker_format": "https://github.com/svalabs/terraform-provider-forgejo/issues/{index}",
+                    "external_tracker_style": "numeric",
+                    "external_tracker_url": "https://github.com/svalabs/terraform-provider-forgejo/issues"
+                  },
+                  "issue_labels": "Default",
+                  "name": "user_test_repo_non_defaults",
+                  "owner": "${forgejo_user.owner.login}",
+                  "private": true,
+                  "readme": "Default",
+                  "template": true,
+                  "trust_model": "collaborator",
+                  "website": "http://localhost:3000"
+                }
+              references:
+                owner: forgejo_user.owner.login
+              dependencies:
+                forgejo_organization.owner: |-
+                    {
+                      "name": "test_org"
+                    }
+                forgejo_user.owner: |-
+                    {
+                      "email": "test_user@localhost.localdomain",
+                      "login": "test_user",
+                      "password": "${var.test_password}"
+                    }
+            - name: clone
+              manifest: |-
+                {
+                  "auth_token": "${var.test_token}",
+                  "clone_addr": "https://github.com/svalabs/terraform-provider-forgejo",
+                  "mirror": false,
+                  "name": "clone_test_repo"
+                }
+              references:
+                auth_token: var.test_token
+              dependencies:
+                forgejo_organization.owner: |-
+                    {
+                      "name": "test_org"
+                    }
+                forgejo_user.owner: |-
+                    {
+                      "email": "test_user@localhost.localdomain",
+                      "login": "test_user",
+                      "password": "${var.test_password}"
+                    }
+            - name: mirror
+              manifest: |-
+                {
+                  "auth_token": "${var.test_token}",
+                  "clone_addr": "https://github.com/svalabs/terraform-provider-forgejo",
+                  "mirror": true,
+                  "mirror_interval": "12h0m0s",
+                  "name": "mirror_test_repo"
+                }
+              references:
+                auth_token: var.test_token
+              dependencies:
+                forgejo_organization.owner: |-
+                    {
+                      "name": "test_org"
+                    }
+                forgejo_user.owner: |-
+                    {
+                      "email": "test_user@localhost.localdomain",
+                      "login": "test_user",
+                      "password": "${var.test_password}"
+                    }
+            - name: imported
+              manifest: |-
+                {
+                  "name": "repository-to-be-imported",
+                  "owner": "${forgejo_user.owner.login}"
+                }
+              references:
+                owner: forgejo_user.owner.login
+              dependencies:
+                forgejo_organization.owner: |-
+                    {
+                      "name": "test_org"
+                    }
+                forgejo_user.owner: |-
+                    {
+                      "email": "test_user@localhost.localdomain",
+                      "login": "test_user",
+                      "password": "${var.test_password}"
+                    }
+        argumentDocs:
+            admin: (Boolean) Allowed to administer?
+            allow_fast_forward_only_merge: '(Boolean) Allowed to fast-forward-only merge pull requests? Note: This setting is only effective if has_pull_requests is true.'
+            allow_manual_merge: '(Boolean) Allowed to manually merge pull requests? Note: This setting is only effective if has_pull_requests is true.'
+            allow_merge_commits: '(Boolean) Allowed to create merge commit? Note: This setting is only effective if has_pull_requests is true.'
+            allow_only_contributors_to_track_time: (Boolean) Let only contributors track time?
+            allow_rebase: '(Boolean) Allowed to rebase then fast-forward? Note: This setting is only effective if has_pull_requests is true.'
+            allow_rebase_explicit: '(Boolean) Allowed to rebase then create merge commit? Note: This setting is only effective if has_pull_requests is true.'
+            allow_rebase_update: '(Boolean) Allowed to update pull request branch by rebase? Note: This setting is only effective if has_pull_requests is true.'
+            allow_squash_merge: '(Boolean) Allowed to create squash commit? Note: This setting is only effective if has_pull_requests is true.'
+            archive_on_destroy: (Boolean) Archive the repo instead of delete?
+            archived: (Boolean) Is the repository archived?
+            auth_token: '(String, Sensitive) API token for authenticating with migrate / clone URL. Note: This setting is only effective if clone_addr is set.'
+            auto_init: (Boolean) Whether the repository should be auto-intialized? Changing this forces a new resource to be created.
+            autodetect_manual_merge: '(Boolean) Auto-detect manual pull request merges? Note: This setting is only effective if has_pull_requests is true.'
+            avatar_url: (String) Avatar URL of the repository.
+            clone_addr: (String) Migrate / clone from URL. Changing this forces a new resource to be created.
+            clone_url: (String) Clone URL of the repository.
+            created_at: (String) Time at which the repository was created.
+            default_allow_maintainer_edit: '(Boolean) Allow maintainer edits on pull requests by default? Note: This setting is only effective if has_pull_requests is true.'
+            default_branch: (String) Default branch of the repository.
+            default_delete_branch_after_merge: '(Boolean) Delete pull request branch after merge by default? Note: This setting is only effective if has_pull_requests is true.'
+            default_merge_style: '(String) Default merge style of the repository. Note: This setting is only effective if has_pull_requests is true.'
+            default_update_style: '(String) Default pull request update style of the repository. Note: This setting is only effective if has_pull_requests is true.'
+            description: (String) Description of the repository.
+            empty: (Boolean) Is the repository empty?
+            enable_issue_dependencies: (Boolean) Enable dependencies for issues and pull requests?
+            enable_prune: '(Boolean) Remove obsolete remote-tracking references when mirroring? Note: This setting is only effective if mirror is true.'
+            enable_time_tracker: (Boolean) Enable time tracking?
+            external_tracker: '(Attributes) Settings for external issue tracker. Note: This setting is only effective if has_issues is true. (see below for nested schema)'
+            external_tracker_format: (String) External issue tracker URL format. Use the placeholders {user}, {repo} and {index} for the username, repository name and issue index.
+            external_tracker_regexp_pattern: (String) External issue tracker issue regular expression.
+            external_tracker_style: (String) External issue tracker number format.
+            external_tracker_url: (String) URL of external issue tracker.
+            external_wiki: '(Attributes) Settings for external wiki. Note: This setting is only effective if has_wiki is true. (see below for nested schema)'
+            external_wiki_url: (String) URL of external wiki.
+            fork: (Boolean) Is the repository a fork?
+            forks_count: (Number) Number of forks of the repository.
+            full_name: (String) Full name of the repository.
+            gitignores: (String) Gitignores to use. Changing this forces a new resource to be created.
+            globally_editable_wiki: '(Boolean) Is the repository wiki globally editable? Note: This setting is only effective if has_wiki is true.'
+            has_actions: (Boolean) Are integrated CI/CD pipelines enabled?
+            has_issues: (Boolean) Is the repository issue tracker enabled?
+            has_packages: (Boolean) Is the repository package registry enabled?
+            has_projects: (Boolean) Are repository projects enabled?
+            has_pull_requests: (Boolean) Are repository pull requests enabled?
+            has_releases: (Boolean) Are repository releases enabled?
+            has_wiki: (Boolean) Is the repository wiki enabled?
+            html_url: (String) HTML URL of the repository.
+            id: (Number) Numeric identifier of the repository.
+            ignore_whitespace_conflicts: '(Boolean) Are whitespace conflicts ignored? Note: This setting is only effective if has_pull_requests is true.'
+            internal: (Boolean) Is the repository internal?
+            internal_tracker: '(Attributes) Settings for built-in issue tracker. Note: This setting is only effective if has_issues is true. (see below for nested schema)'
+            issue_labels: (String) Issue Label set to use. Changing this forces a new resource to be created.
+            labels: '(Boolean) Whether to migrate labels. Changing this forces a new resource to be created. Note: This setting is only effective if clone_addr is set.'
+            lfs: '(Boolean) Whether to migrate LFS files. Changing this forces a new resource to be created. Note: This setting is only effective if clone_addr is set.'
+            lfs_endpoint: '(String) LFS endpoint to use. Changing this forces a new resource to be created. Note: This setting is only effective if lfs is true.'
+            license: (String) License to use. Changing this forces a new resource to be created.
+            milestones: '(Boolean) Whether to migrate milestones. Changing this forces a new resource to be created. Note: This setting is only effective if clone_addr is set.'
+            mirror: '(Boolean) Is the repository a mirror? Changing this forces a new resource to be created. Note: This setting is only effective if clone_addr is set.'
+            mirror_interval: '(String) Mirror interval of the repository. Note: This setting is only effective if mirror is true.'
+            mirror_updated: (String) Time at which the repository mirror was updated.
+            name: (String) Name of the repository.
+            open_issues_count: (Number) Number of open issues of the repository.
+            open_pr_counter: (Number) Number of open pull requests of the repository.
+            owner: (String) Owner of the repository (user or organization). Changing this forces a new resource to be created.
+            parent_id: (Number) Numeric identifier of the parent repository.
+            permissions: (Attributes) Permissions of the repository. (see below for nested schema)
+            private: (Boolean) Is the repository private?
+            pull: (Boolean) Allowed to pull?
+            push: (Boolean) Allowed to push?
+            readme: (String) Readme of the repository to create. Changing this forces a new resource to be created.
+            release_counter: (Number) Number of releases of the repository.
+            service: '(String) Service to migrate from. Changing this forces a new resource to be created. Note: This setting is only effective if clone_addr is set.'
+            size: (Number) Size of the repository in KiB.
+            ssh_url: (String) SSH URL of the repository.
+            stars_count: (Number) Number of stars of the repository.
+            template: (Boolean) Is the repository a template?
+            trust_model: (String) TrustModel of the repository. Changing this forces a new resource to be created.
+            updated_at: (String) Time at which the repository was updated.
+            watchers_count: (Number) Number of watchers of the repository.
+            website: (String) Website of the repository.
+            wiki_branch: '(String) Branch used for the repository wiki. Note: This setting is only effective if has_wiki is true.'
+        importStatements:
+            - |-
+              # Import using the repo_owner/repo_name.
+              terraform import forgejo_repository.imported test_user/repository-to-be-imported
+    forgejo_repository_action_secret:
+        subCategory: ""
+        description: Forgejo repository action secret resource.
+        name: forgejo_repository_action_secret
+        title: forgejo_repository_action_secret Resource - forgejo
+        examples:
+            - name: this
+              manifest: |-
+                {
+                  "data": "my_secret_value",
+                  "name": "my_secret",
+                  "repository_id": "${forgejo_repository.personal.id}"
+                }
+              references:
+                repository_id: forgejo_repository.personal.id
+              dependencies:
+                forgejo_repository.personal: |-
+                    {
+                      "name": "personal_test_repo"
+                    }
+        argumentDocs:
+            created_at: (String) Time at which the secret was created.
+            data: (String, Sensitive) Data of the secret.
+            name: (String) Name of the secret. Changing this forces a new resource to be created.
+            repository_id: (Number) Numeric identifier of the repository. Changing this forces a new resource to be created.
+        importStatements: []
+    forgejo_repository_action_variable:
+        subCategory: ""
+        description: Forgejo repository action variable resource.
+        name: forgejo_repository_action_variable
+        title: forgejo_repository_action_variable Resource - forgejo
+        examples:
+            - name: this
+              manifest: |-
+                {
+                  "data": "my_variable_value",
+                  "name": "my_variable",
+                  "repository_id": "${forgejo_repository.personal.id}"
+                }
+              references:
+                repository_id: forgejo_repository.personal.id
+              dependencies:
+                forgejo_repository.personal: |-
+                    {
+                      "name": "personal_test_repo"
+                    }
+        argumentDocs:
+            data: (String) Data of the variable.
+            name: (String) Name of the variable.
+            repository_id: (Number) Numeric identifier of the repository. Changing this forces a new resource to be created.
+        importStatements: []
+    forgejo_repository_webhook:
+        subCategory: ""
+        description: Forgejo repository webhook resource.
+        name: forgejo_repository_webhook
+        title: forgejo_repository_webhook Resource - forgejo
+        examples:
+            - name: example
+              manifest: |-
+                {
+                  "authorization_header": "Bearer token123456",
+                  "branch_filter": "*",
+                  "config": {
+                    "content_type": "json",
+                    "secret": "supersecret",
+                    "url": "http://example.com/invoke"
+                  },
+                  "events": [
+                    "push"
+                  ],
+                  "repository_id": "${forgejo_repository.personal.id}",
+                  "type": "forgejo"
+                }
+              references:
+                repository_id: forgejo_repository.personal.id
+              dependencies:
+                forgejo_repository.personal: |-
+                    {
+                      "name": "personal_test_repo"
+                    }
+        argumentDocs:
+            active: (Boolean) Boolean indicating if the webhook is active.
+            authorization_header: (String, Sensitive) Authorization header to send to the target.
+            branch_filter: (String) List of allowed branches for push, branch creation and branch deletion events, specified as glob pattern. If empty or *, events for all branches are reported.
+            config: '(Map of String) Map of configuration settings, e.g. "content_type" and "url". The "secret" key is write-only: Forgejo accepts it on create/update but never returns it, so the provider preserves the configured value instead of reading it back, and cannot detect changes made outside of Terraform.'
+            created_at: (String) Time at which the webhook was created.
+            events: (Set of String) List of events which trigger the webhook.
+            repository_id: (Number) Numeric identifier of the repository. Changing this forces a new resource to be created.
+            type: (String) Type of webhook. Changing this forces a new resource to be created.
+            updated_at: (String) Time at which the webhook was updated.
+            webhook_id: (Number) Numeric identifier of the webhook.
+        importStatements:
+            - |-
+              # Import using the repo_owner/repo_name/webhook_id.
+              terraform import forgejo_repository_webhook.example tfadmin/personal_test_repo/123
+    forgejo_ssh_key:
+        subCategory: ""
+        description: 'Forgejo user SSH key resource. Note: Managing user SSH keys requires administrative privileges!'
+        name: forgejo_ssh_key
+        title: forgejo_ssh_key Resource - forgejo
+        examples:
+            - name: this
+              manifest: |-
+                {
+                  "key": "${trimspace(tls_private_key.ed25519.public_key_openssh)}",
+                  "title": "test_key",
+                  "user": "${forgejo_user.test.login}"
+                }
+              references:
+                user: forgejo_user.test.login
+              dependencies:
+                forgejo_user.test: |-
+                    {
+                      "email": "test_user@localhost.localdomain",
+                      "login": "test_user",
+                      "password": "${var.test_password}"
+                    }
+                tls_private_key.ed25519: |-
+                    {
+                      "algorithm": "ED25519"
+                    }
+        argumentDocs:
+            created_at: (String) Time at which the SSH key was created.
+            fingerprint: (String) Fingerprint of the SSH key.
+            key: (String) Armored SSH key. Trailing newlines must be removed (e.g. using trimspace() function). Changing this forces a new resource to be created.
+            key_id: (Number) Numeric identifier of the SSH key.
+            key_type: (String) Type of the SSH key.
+            read_only: (Boolean) Does the key have only read access?
+            title: (String) Title of the SSH key. Changing this forces a new resource to be created.
+            url: (String) URL of the SSH key.
+            user: (String) Name of the user. Changing this forces a new resource to be created.
+        importStatements: []
+    forgejo_team:
+        subCategory: ""
+        description: 'Forgejo team resource. Note: The authenticated user must be a member of the managed organization(s) or have administrative privileges!'
+        name: forgejo_team
+        title: forgejo_team Resource - forgejo
+        examples:
+            - name: default_team
+              manifest: |-
+                {
+                  "name": "org_test_team_defaults",
+                  "organization_id": "${forgejo_organization.owner.id}",
+                  "units_map": {
+                    "repo.code": "read"
+                  }
+                }
+              references:
+                organization_id: forgejo_organization.owner.id
+              dependencies:
+                forgejo_organization.owner: |-
+                    {
+                      "name": "test_org"
+                    }
+            - name: custom_team
+              manifest: |-
+                {
+                  "can_create_org_repo": true,
+                  "description": "A team with non-default parameters.",
+                  "includes_all_repositories": true,
+                  "name": "org_test_team_non_defaults",
+                  "organization_id": "${forgejo_organization.owner.id}",
+                  "permission": "read",
+                  "units_map": {
+                    "repo.code": "read",
+                    "repo.issues": "write",
+                    "repo.pulls": "read"
+                  }
+                }
+              references:
+                organization_id: forgejo_organization.owner.id
+              dependencies:
+                forgejo_organization.owner: |-
+                    {
+                      "name": "test_org"
+                    }
+        argumentDocs:
+            can_create_org_repo: (Boolean) Can create repositories?
+            description: (String) Description of the team.
+            id: (Number) Numeric identifier of the team.
+            includes_all_repositories: (Boolean) Has access to all repositories?
+            name: (String) Name of the team.
+            organization: '(String) Name of the owning organization. Changing this forces a new resource to be created. Note: One of organization or organization_id must be specified.'
+            organization_id: '(Number) Numeric identifier of the owning organization. Changing this forces a new resource to be created. Note: One of organization or organization_id must be specified.'
+            permission: '(String) Permissions within the owning organization. Note: If you set admin or owner here, make sure to set the correct units_map.'
+            units_map: '(Map of String) Map of access units. Note: If the permission is admin or owner all units must be set to admin as well.'
+        importStatements:
+            - |-
+              # Import using the org_name/team.
+              terraform import forgejo_team.default_team test_org/org_test_team_defaults
+    forgejo_team_member:
+        subCategory: ""
+        description: Forgejo team member resource.
+        name: forgejo_team_member
+        title: forgejo_team_member Resource - forgejo
+        examples:
+            - name: membership
+              manifest: |-
+                {
+                  "team_id": "${forgejo_team.team.id}",
+                  "user": "${forgejo_user.test.login}"
+                }
+              references:
+                team_id: forgejo_team.team.id
+                user: forgejo_user.test.login
+              dependencies:
+                forgejo_organization.owner: |-
+                    {
+                      "name": "test_org"
+                    }
+                forgejo_team.team: |-
+                    {
+                      "name": "org_test_team",
+                      "organization_id": "${forgejo_organization.owner.id}",
+                      "units_map": {
+                        "repo.code": "read"
+                      }
+                    }
+                forgejo_user.test: |-
+                    {
+                      "email": "test_user@localhost.localdomain",
+                      "login": "test_user",
+                      "password": "${var.test_password}"
+                    }
+        argumentDocs:
+            team_id: (Number) Numeric identifier of the team. Changing this forces a new resource to be created.
+            user: (String) Username of the team member. Changing this forces a new resource to be created.
+        importStatements: []
+    forgejo_user:
+        subCategory: ""
+        description: 'Forgejo user resource. Note: Managing users requires administrative privileges!'
+        name: forgejo_user
+        title: forgejo_user Resource - forgejo
+        examples:
+            - name: defaults
+              manifest: |-
+                {
+                  "email": "test_user_defaults@localhost.localdomain",
+                  "login": "test_user_defaults",
+                  "password": "${var.test_password}"
+                }
+              references:
+                password: var.test_password
+            - name: non_defaults
+              manifest: |-
+                {
+                  "description": "Purely for testing...",
+                  "email": "test_user_non_defaults@localhost.localdomain",
+                  "full_name": "Terraform Test User with non-default attributes",
+                  "location": "Mêlée Island",
+                  "login": "test_user_non_defaults",
+                  "password": "${var.test_password}",
+                  "visibility": "private",
+                  "website": "https://forgejo.org/"
+                }
+              references:
+                password: var.test_password
+        argumentDocs:
+            active: (Boolean) Is the user active?
+            admin: (Boolean) Is the user an administrator?
+            allow_create_organization: (Boolean) Allow user to create organizations?
+            allow_git_hook: (Boolean) Allow user to create Git hooks?
+            allow_import_local: (Boolean) Allow user to import local repositories?
+            avatar_url: (String) Avatar URL of the user.
+            created_at: (String) Time at which the user was created.
+            deactivate_on_destroy: (Boolean) Deactivate the user instead of delete?
+            description: (String) Description of the user.
+            email: (String) Email address of the user.
+            followers_count: (Number) Number of following users.
+            following_count: (Number) Number of users followed.
+            full_name: (String) Full name of the user.
+            html_url: (String) URL to the user's profile page.
+            id: (Number) Numeric identifier of the user.
+            language: (String) Locale of the user.
+            last_login: (String) Time at which the user last logged in.
+            location: (String) Location of the user.
+            login: (String) Name of the user. Changing this forces a new resource to be created.
+            login_name: (String) Login name of the user.
+            max_repo_creation: (Number) Maximum number of repositories user can create. A value of -1 means no limit.
+            must_change_password: (Boolean) Require user to change password?
+            password: (String, Sensitive) Password of the user.
+            prohibit_login: (Boolean) Are user logins prohibited?
+            restricted: (Boolean) Is the user restricted?
+            send_notify: (Boolean) Send notification to administrators? Changing this forces a new resource to be created.
+            source_id: (Number) Numeric identifier of the user's authentication source.
+            starred_repos_count: (Number) Number of starred repositories.
+            visibility: (String) Visibility of the user. Possible values are 'public' (default), 'limited', or 'private'.
+            website: (String) Website of the user.
+        importStatements:
+            - |-
+              # Import using the users login.
+              terraform import forgejo_user.defaults test_user_defaults

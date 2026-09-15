@@ -1,0 +1,12 @@
+apiVersion: forgejo.m.crossplane.io/v1beta1
+kind: ProviderConfig
+metadata:
+  name: crossplane-forgejo-config
+  namespace: default
+spec:
+  credentials:
+    source: Secret
+    secretRef:
+      name: provider-forgejo-credentials
+      namespace: default
+      key: credentials
